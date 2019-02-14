@@ -20,7 +20,7 @@ public class ScreenClientHandler extends SimpleChannelInboundHandler<ByteBuf> {
 		byte[] bytes=new byte[buf.readableBytes()];
         buf.readBytes(bytes);
 		BufferedImage img=ImageByteUtil.byte2Image(bytes);
-		MainFrame.showImg(img);
+		MainFrame.getInstance().showImg(img);
 	}
 
 	@Override

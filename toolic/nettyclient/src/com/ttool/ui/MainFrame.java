@@ -10,6 +10,7 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
+import java.util.Date;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -19,9 +20,12 @@ import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 
+import com.ttool.biz.entity.SignInRecord;
+import com.ttool.biz.signinrecord.SignInRecordServiceImpl;
 import com.ttool.communication.CommandInterface;
 import com.ttool.communication.ScreenInterface;
 import com.ttool.util.Constant;
+import com.ttool.util.IpUtil;
 
 public class MainFrame extends JFrame {
 	private static MainFrame mainFrame;
@@ -95,7 +99,6 @@ public class MainFrame extends JFrame {
 	public void setToolBar() {
 		ToolBarActionListener toolBarActionListener = new ToolBarActionListener(this);
 		toolBar = new JToolBar();
-//		toolBar.setRollover(true);
 		toolBar.setFloatable(false);
 		// Logo
 		JLabel lblLogo = new JLabel();
@@ -122,11 +125,23 @@ public class MainFrame extends JFrame {
 		btnRecordScreen.setSize(50, 50);
 		ImageIcon imgRecordScreen = new ImageIcon("image/lp.png");
 		btnRecordScreen.setIcon(imgRecordScreen);
-		Image tempRecordScreen = imgScreen.getImage().getScaledInstance(btnRecordScreen.getWidth(),
+		Image tempRecordScreen = imgRecordScreen.getImage().getScaledInstance(btnRecordScreen.getWidth(),
 				btnRecordScreen.getHeight(), Image.SCALE_DEFAULT);
-		btnScreen.setIcon(new ImageIcon(tempRecordScreen));
+		btnRecordScreen.setIcon(new ImageIcon(tempRecordScreen));
 		toolBar.add(btnRecordScreen);
-
+		// 人脸识别签到
+		if (Constant.nowClass != null) {
+			JButton btnFaceRecord = new JButton("人脸签到");
+			btnFaceRecord.setToolTipText("人脸识别并上课签到！");
+			btnFaceRecord.addActionListener(toolBarActionListener);
+			btnFaceRecord.setSize(50, 50);
+			ImageIcon imgFaceRecord = new ImageIcon("image/fr.png");
+			btnFaceRecord.setIcon(imgFaceRecord);
+			Image tempFaceRecord = imgFaceRecord.getImage().getScaledInstance(btnFaceRecord.getWidth(),
+					btnFaceRecord.getHeight(), Image.SCALE_DEFAULT);
+			btnFaceRecord.setIcon(new ImageIcon(tempFaceRecord));
+			toolBar.add(btnFaceRecord);
+		}
 		this.getContentPane().add(toolBar);
 		toolBar.setBounds(0, 0, initWidth, 50);
 	}
@@ -192,7 +207,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * 连接并显示教师端共享的屏幕
 	 */
-	public static void connectAndDisplayScreen() {
+	public void connectAndDisplayScreen() {
 		CommandInterface.sendCommand(Constant.COMMAND_SEND_TEACHER_SCREEN_REQUEST);
 		btnScreen.setText("停止查看屏幕");
 		btnScreen.setToolTipText("停止查看教师的电脑屏幕");
@@ -205,7 +220,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * 断开连接，不再显示教师端的共享屏幕
 	 */
-	public static void stopDisplayScreen() {
+	public void stopDisplayScreen() {
 		CommandInterface.sendCommand(Constant.COMMAND_NOT_SEND_TEACHER_SCREEN_REQUEST);
 		btnScreen.setText("查看屏幕");
 		btnScreen.setToolTipText("查看教师的电脑屏幕");
@@ -213,7 +228,6 @@ public class MainFrame extends JFrame {
 		lblScreen = null;
 		rightPanel.removeAll();
 		rightPanel.repaint();
-
 	}
 
 	/**
@@ -221,17 +235,27 @@ public class MainFrame extends JFrame {
 	 * 
 	 * @param img
 	 */
-	public static void showImg(BufferedImage img) {
+	public void showImg(BufferedImage img) {
 		lblScreen.setIcon(new ImageIcon(resize(img, rightPanel.getWidth(), rightPanel.getHeight())));
 		lblScreen.repaint();
 	}
 
-	public static BufferedImage resize(BufferedImage img, int newW, int newH) {
+	public BufferedImage resize(BufferedImage img, int newW, int newH) {
 		BufferedImage dimg = new BufferedImage(newW, newH, img.getType());
 		Graphics2D g = dimg.createGraphics();
 		g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 		g.drawImage(img, 0, 0, newW, newH, null);
 		g.dispose();
 		return dimg;
+	}
+
+	public void faceRecord() {
+		SignInRecord signInRecord = new SignInRecord();
+		signInRecord.setClassId(Constant.nowClass.getId());
+		signInRecord.setStuId(Constant.student.getId());
+		signInRecord.setStuIp(IpUtil.getRealIP());
+		signInRecord.setSignInTime(new Date());
+		SignInRecordServiceImpl signInRecordServiceImpl = new SignInRecordServiceImpl();
+		signInRecordServiceImpl.checkIn(signInRecord);
 	}
 }

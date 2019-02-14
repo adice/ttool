@@ -37,12 +37,12 @@ public class CommandClientHandler extends ChannelInboundHandlerAdapter {
         System.out.println("command--"+bytes.length+":"+bytes[0]);
         buf.release();
         if(bytes[0]==Constant.COMMAND_NOT_SEND_TEACHER_SCREEN_REQUEST) {
-        	MainFrame.stopDisplayScreen();
+        	MainFrame.getInstance().stopDisplayScreen();
         }
         if(bytes[0]==Constant.COMMAND_SEND_STUDENT_SCREEN_REQUEST) {
         	//停止接收教师端截屏
         	CommandInterface.sendCommand(Constant.COMMAND_NOT_SEND_TEACHER_SCREEN_REQUEST);
-			MainFrame.stopDisplayScreen();
+			MainFrame.getInstance().stopDisplayScreen();
 			//启动线程，向教师端发送截屏
 			ScreenInterface.sendScreen();
 			//TODO 将共享教师屏幕按钮置灰，禁止再接收教师屏幕

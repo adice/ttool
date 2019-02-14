@@ -17,6 +17,9 @@ public class ToolBarActionListener implements ActionListener {
 		if("停止查看屏幕".equals(e.getActionCommand())) {
 			this.mainFrame.stopDisplayScreen();
 		}
+		if("人脸签到".equals(e.getActionCommand())) {
+			this.mainFrame.faceRecord();
+		}
 	}
 
 }

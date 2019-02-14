@@ -4,7 +4,7 @@ import com.ttool.biz.entity.ActualClass;
 import com.ttool.biz.entity.Student;
 
 public class Constant {
-	// 当前教师
+	// 当前学生
 	public static Student student;
 	// 当天的授课班级
 	public static ActualClass nowClass;
