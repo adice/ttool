@@ -1,16 +1,21 @@
 package com;
 
+import javax.swing.JButton;
+
 import com.ttool.ui.MainFrame;
 
 public class Test {
 
 	public static void main(String[] args) {
+		JButton btn=new JButton();
+		System.out.println(btn.getBackground());
+		
 		//测试读写properties
 //		PropertyUtil.readConfig();
 //		PropertyUtil.writeConfig("2018-2019","1","2019-1-9");
 		
 		//测试主界面
-		MainFrame.getInstance();
+//		MainFrame.getInstance();
 		
 //		//测试课程安排的JSON格式
 //		CourseTime ct1=new CourseTime();

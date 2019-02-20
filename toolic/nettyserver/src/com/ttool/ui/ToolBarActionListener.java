@@ -13,12 +13,17 @@ public class ToolBarActionListener implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if ("共享屏幕".equals(e.getActionCommand())) {
-			this.mainFrame.openScreenServerAndSendScreen();
+			this.mainFrame.sendScreen();
 		}
 		if ("停止共享屏幕".equals(e.getActionCommand())) {
 			this.mainFrame.stopSendScreen();
 		}
-
+		if ("随机点名".equals(e.getActionCommand())) {
+			this.mainFrame.randomCall();
+		}
+		if ("停".equals(e.getActionCommand())) {
+			this.mainFrame.stopRandomCall();
+		}
 	}
 
 }

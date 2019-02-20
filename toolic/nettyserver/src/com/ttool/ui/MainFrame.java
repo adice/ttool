@@ -1,5 +1,6 @@
 package com.ttool.ui;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -7,7 +8,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -35,9 +37,13 @@ public class MainFrame extends JFrame {
 	private JPanel rightPanel;
 	private JScrollPane scrollPane;
 	private JPanel lblPanel;
+	private List<JLabel> lblList = new ArrayList<JLabel>(0);
 	// 工具栏
 	private JToolBar toolBar;
 	private JButton btnScreen;
+	private JButton btnRandomCall;
+	// 随机点名线程
+	private CallNameThread callNameThread;
 	// 屏幕初始宽高
 	private int initWidth = 1280;
 	private int initHeight = 720;
@@ -127,11 +133,20 @@ public class MainFrame extends JFrame {
 		btnRecordScreen.addActionListener(toolBarActionListener);
 		btnRecordScreen.setSize(50, 50);
 		ImageIcon imgRecordScreen = new ImageIcon("image/lp.png");
-		btnRecordScreen.setIcon(imgRecordScreen);
-		Image tempRecordScreen = imgScreen.getImage().getScaledInstance(btnRecordScreen.getWidth(),
+		Image tempRecordScreen = imgRecordScreen.getImage().getScaledInstance(btnRecordScreen.getWidth(),
 				btnRecordScreen.getHeight(), Image.SCALE_DEFAULT);
-		btnScreen.setIcon(new ImageIcon(tempRecordScreen));
+		btnRecordScreen.setIcon(new ImageIcon(tempRecordScreen));
 		toolBar.add(btnRecordScreen);
+		// 随机点名
+		btnRandomCall = new JButton("随机点名");
+		btnRandomCall.setToolTipText("随机选择学生回答问题！");
+		btnRandomCall.addActionListener(toolBarActionListener);
+		btnRandomCall.setSize(50, 50);
+		ImageIcon imgRandomCall = new ImageIcon("image/xsys.png");
+		Image tempRandomCall = imgRandomCall.getImage().getScaledInstance(btnRandomCall.getWidth(),
+				btnRandomCall.getHeight(), Image.SCALE_DEFAULT);
+		btnRandomCall.setIcon(new ImageIcon(tempRandomCall));
+		toolBar.add(btnRandomCall);
 
 		this.getContentPane().add(toolBar);
 		toolBar.setBounds(0, 0, initWidth, 50);
@@ -195,7 +210,7 @@ public class MainFrame extends JFrame {
 	}
 
 	public void setStudents() {
-		lblPanel.removeAll();
+		lblPanel.removeAll();		
 		int numPerRow = (splitPane.getWidth() - splitPane.getDividerLocation()) / 100;
 		int rows;
 		int numStudent = CommandChannelContainer.getContainer().size();
@@ -204,14 +219,16 @@ public class MainFrame extends JFrame {
 		else
 			rows = numStudent / numPerRow + 1;
 		ImageIcon imgScreen = new ImageIcon("image/yckz.png");
-		int i=0,j=0;
-		for(Student stu:CommandChannelContainer.getContainer().keySet()) {
+		int i = 0, j = 0;
+		for (Student stu : CommandChannelContainer.getContainer().keySet()) {
 			JLabel lbl = new JLabel();
 			lbl.setIcon(imgScreen);
+			lbl.setToolTipText(stu.getId());
 			lbl.setText(stu.getName());
 			lbl.setVerticalTextPosition(JLabel.BOTTOM);
 			lbl.setHorizontalTextPosition(JLabel.CENTER);
 			lblPanel.add(lbl);
+			lblList.add(lbl);
 			lbl.setBounds(30 + i * 100, 10 + j * 100, 100, 100);
 			i++;
 			if (i >= numPerRow - 1) {
@@ -228,7 +245,7 @@ public class MainFrame extends JFrame {
 	/**
 	 * 给学生发送截屏
 	 */
-	public void openScreenServerAndSendScreen() {
+	public void sendScreen() {
 		ScreenInterface.sendScreen();
 		btnScreen.setText("停止共享屏幕");
 		btnScreen.setToolTipText("停止给学生播放自己的电脑屏幕");
@@ -246,4 +263,20 @@ public class MainFrame extends JFrame {
 		btnScreen.setToolTipText("给学生播放自己的电脑屏幕");
 	}
 
+	/**
+	 * 随机点名
+	 */
+	public void randomCall() {
+		callNameThread = new CallNameThread(lblList);
+		new Thread(callNameThread).start();
+		btnRandomCall.setText("停");
+	}
+
+	/**
+	 * 停
+	 */
+	public void stopRandomCall() {
+		callNameThread.setBegin(false);
+		btnRandomCall.setText("随机点名");
+	}
 }
