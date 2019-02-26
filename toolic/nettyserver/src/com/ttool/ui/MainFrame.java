@@ -1,11 +1,12 @@
 package com.ttool.ui;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowStateListener;
 import java.util.ArrayList;
@@ -15,7 +16,9 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
@@ -42,6 +45,9 @@ public class MainFrame extends JFrame {
 	private JToolBar toolBar;
 	private JButton btnScreen;
 	private JButton btnRandomCall;
+	// 学生上的右键菜单
+	private JPopupMenu studentMenu;
+	private JMenuItem screenMenu;
 	// 随机点名线程
 	private CallNameThread callNameThread;
 	// 屏幕初始宽高
@@ -57,6 +63,8 @@ public class MainFrame extends JFrame {
 
 		// 设置工具栏
 		setToolBar();
+		// 设置右键菜单
+		setPopupMenu();
 		// 设置Split面板
 		setSplitPanel();
 		// 设置左侧面板
@@ -151,6 +159,12 @@ public class MainFrame extends JFrame {
 		this.getContentPane().add(toolBar);
 		toolBar.setBounds(0, 0, initWidth, 50);
 	}
+	
+	public void setPopupMenu() {
+		studentMenu = new JPopupMenu();
+		screenMenu = new JMenuItem("共享学生屏幕");
+		studentMenu.add(screenMenu);
+	}
 
 	/**
 	 * 设置分隔面板
@@ -227,6 +241,14 @@ public class MainFrame extends JFrame {
 			lbl.setText(stu.getName());
 			lbl.setVerticalTextPosition(JLabel.BOTTOM);
 			lbl.setHorizontalTextPosition(JLabel.CENTER);
+			lbl.addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseReleased(MouseEvent e) {
+					if(e.isPopupTrigger()) {
+						studentMenu.show(e.getComponent(), e.getX(), e.getY());
+					}
+				}
+			});
 			lblPanel.add(lbl);
 			lblList.add(lbl);
 			lbl.setBounds(30 + i * 100, 10 + j * 100, 100, 100);
